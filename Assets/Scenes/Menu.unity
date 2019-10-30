@@ -261,7 +261,7 @@ MonoBehaviour:
   m_OfflineScene: Menu
   m_OnlineScene: World
   m_SpawnPrefabs:
-  - {fileID: 0}
+  - {fileID: 6627230360584330359, guid: de4e541605aefa146bb9b6e366a789a6, type: 3}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:

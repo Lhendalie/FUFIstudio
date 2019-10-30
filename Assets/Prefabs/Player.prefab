@@ -368,6 +368,7 @@ MonoBehaviour:
   characterModel:
   - {fileID: 4638053554149085854}
   - {fileID: 4638053554149085848}
+  myChat: {fileID: 0}
 --- !u!114 &669137883209499477
 MonoBehaviour:
   m_ObjectHideFlags: 0
