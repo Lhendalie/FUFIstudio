@@ -13,6 +13,7 @@ TagManager:
   - ProjMember
   - ProjGDD
   - gallery
+  - comment
   layers:
   - Default
   - TransparentFX

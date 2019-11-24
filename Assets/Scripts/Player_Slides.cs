@@ -34,8 +34,7 @@ public class Player_Slides : NetworkBehaviour
                     CmdShowPreviousSlide(currentSlideNumber);
                 }
             }
-        }
-        
+        }        
     }
 
     [ClientRpc]

@@ -1,11 +1,13 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class Player_Create : NetworkBehaviour
 {
-    private Renderer planeRenderer;
+    private List<string> comments = new List<string>();
+    private string allComments;
 
     GameObject projNamePanel;
     GameObject projTaskPanel;
@@ -13,6 +15,7 @@ public class Player_Create : NetworkBehaviour
     GameObject addMemberPanel;
     GameObject codePanel;
     GameObject uploadImagePanel;
+    GameObject uploadCommentPanel;
 
     private InputField projName;
     private InputField projTaskName;
@@ -30,200 +33,270 @@ public class Player_Create : NetworkBehaviour
     private InputField codeField;
     private InputField urlInput;
     private InputField caption;
-
-    //private Text projectNameDashboard;
-    //private Text projectMembersDashboard;
-    //private Text GDDDashboard;
-    //private Text projectTasksDashboard;
-
-    [SyncVar]
-    private string projNameString;
-    [SyncVar]
-    private string projTaskNameString;
-    [SyncVar]
-    private string projTaskDescriptionString;
-    [SyncVar]
-    private string projTaskMemberString;
-    [SyncVar]
-    private string projOverviewString;
-    [SyncVar]
-    private string projPlatformsString;
-    [SyncVar]
-    private string projGenreString;
-    [SyncVar]
-    private string projTargetAudienceString;
-    [SyncVar]
-    private string projStorylineString;
-    [SyncVar]
-    private string projGameplayString;
-    [SyncVar]
-    private string projAssetsString;
-    [SyncVar]
-    private string projTestingString;
-    [SyncVar]
-    private string addMemberString;
-    [SyncVar]
-    private string codeString;
-    [SyncVar]
-    private string urlInputString;
-    [SyncVar]
-    private string captionString;
-
-    [SyncVar]
-    private bool imageChanged;
+    private InputField uploadedComment;
 
     void Start()
     {
         GetData();
     }
 
-    private void Update()
-    {
-
-    }
-
     private void OnTriggerStay(Collider other)
     {
-        
-
         if (other.CompareTag("ProjName"))
         {
             ShowUI();
             HideUI();
 
-            if (isServer)
+            if (Input.GetKeyDown(KeyCode.Return) && projNamePanel.activeInHierarchy)
             {
-                projNameString = projName.text;
-                RpcChangeDashBoardName(other.gameObject);
-            }
-        }
-        if(other.CompareTag("ProjTask"))
-        {
-            ShowUI();
-            HideUI();
-            if (isServer)
-            {
-                projTaskNameString = projTaskName.text;
-                projTaskDescriptionString = projTaskDescription.text;
-                projTaskMemberString = projTaskMember.text;
-                RpcChangeDashboardTasks(other.gameObject);
-            }
-        }
-        if(other.CompareTag("ProjMember"))
-        {
-            ShowUI();
-            HideUI();
-            if (isServer)
-            {
-                addMemberString = addMember.text;
-                RpcChangeDashboardMembers(other.gameObject);
-            }
-        }
-        if(other.CompareTag("ProjGDD"))
-        {
-            ShowUI();
-            HideUI();
-            if (isServer)
-            {
-                projOverviewString = projOverview.text;
-                projPlatformsString = projPlatforms.text;
-                projGenreString = projGenre.text;
-                projTargetAudienceString = projTargetAudience.text;
-                projStorylineString = projStoryline.text;
-                projGameplayString = projGameplay.text;
-                projAssetsString = projAssets.text;
-                projTestingString = projTesting.text;
-
-                RpcChangeDashboardGDD(other.gameObject);
-            }
-        }
-        if(other.CompareTag("computer"))
-        {
-            if (isServer)
-            {
-                if (Input.GetKeyDown(KeyCode.K))
+                if (isServer)
                 {
-                    codePanel.SetActive(true);
+                    RpcChangeDashBoardName(other.gameObject, projName.text);
                 }
-                else if (Input.GetKeyDown(KeyCode.Escape))
+                if (isLocalPlayer)
                 {
-                    codePanel.SetActive(false);
+                    CmdChangeDashboardName(other.gameObject, projName.text);
                 }
-
-                codeString = codeField.text;
-                RpcChangeCode(other.gameObject);
             }
+        }
+
+        if (other.CompareTag("ProjTask"))
+        {
+            ShowUI();
+            HideUI();
+
+            if (Input.GetKeyDown(KeyCode.Return) && projTaskPanel.activeInHierarchy)
+            {
+                if (isServer)
+                {
+                    RpcChangeDashboardTasks(other.gameObject, projTaskName.text, projTaskDescription.text, projTaskMember.text);
+                }
+                if (isLocalPlayer)
+                {
+                    CmdChangeDashboardTasks(other.gameObject, projTaskName.text, projTaskDescription.text, projTaskMember.text);
+                }
+            }
+        }
+
+        if (other.CompareTag("ProjMember"))
+        {
+            ShowUI();
+            HideUI();
+
+            if (Input.GetKeyDown(KeyCode.Return) && addMemberPanel.activeInHierarchy)
+            {
+                if (isServer)
+                {
+                    RpcChangeDashboardMembers(other.gameObject, addMember.text);
+                }
+                if (isLocalPlayer)
+                {
+                    CmdChangeDashboardMembers(other.gameObject, addMember.text);
+                }
+            }
+        }
+
+        if (other.CompareTag("ProjGDD"))
+        {
+            ShowUI();
+            HideUI();
+
+            if (Input.GetKeyDown(KeyCode.Return) && gddPanel.activeInHierarchy)
+            {
+                if (isServer)
+                {
+                    RpcChangeDashboardGDD(other.gameObject, projOverview.text, projPlatforms.text, projGenre.text, projTargetAudience.text, projStoryline.text, projGameplay.text, projAssets.text, projTesting.text);
+                }
+                if (isLocalPlayer)
+                {
+                    CmdChangeDashboardGDD(other.gameObject, projOverview.text, projPlatforms.text, projGenre.text, projTargetAudience.text, projStoryline.text, projGameplay.text, projAssets.text, projTesting.text);
+                }
+            }
+        }
+
+        if (other.CompareTag("computer"))
+        {
+            if (Input.GetKeyDown(KeyCode.K))
+            {
+                codePanel.SetActive(true);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                codePanel.SetActive(false);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Return) && codePanel.activeInHierarchy)
+            {
+                if (isServer)
+                {
+                    RpcChangeCode(other.gameObject, codeField.text);
+                }
+                if (isLocalPlayer)
+                {
+                    CmdChangeCode(other.gameObject, codeField.text);
+                }
+            }
+
             if (Input.GetKeyDown(KeyCode.I))
             {
                 OpenBrowser();
             }
         }
+
         if (other.CompareTag("gallery"))
         {
-            if (isServer)
+            if (Input.GetKeyDown(KeyCode.U))
             {
-                if(Input.GetKeyDown(KeyCode.U))
+                uploadImagePanel.SetActive(true);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                uploadImagePanel.SetActive(false);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Return) && uploadImagePanel.activeInHierarchy)
+            {
+                uploadImagePanel.SetActive(false);
+
+
+                if (isServer)
                 {
-                    uploadImagePanel.SetActive(true);
+                    RpcUploadImage(other.gameObject, urlInput.text, caption.text);
+                    Debug.Log(other.gameObject.name);
+                    Debug.Log("Called on server.");
                 }
-                if(Input.GetKeyDown(KeyCode.Escape))
+
+                Debug.Log("Called on enter.");
+
+                if (isLocalPlayer)
                 {
-                    uploadImagePanel.SetActive(false);
+                    Debug.Log("Called on player.");
+                    CmdUploadImage(other.gameObject, urlInput.text, caption.text);
                 }
-                else if(Input.GetKeyDown(KeyCode.Return) && uploadImagePanel.activeInHierarchy)
+            }
+        }
+
+        if (other.CompareTag("comment"))
+        {            
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                uploadCommentPanel.SetActive(true);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                uploadCommentPanel.SetActive(false);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Return) && uploadCommentPanel.activeInHierarchy)
+            {
+                comments.Add(uploadedComment.text);
+                if (comments.Count >= 24)
                 {
-                    urlInputString = urlInput.text;
-                    imageChanged = true;
-                    uploadImagePanel.SetActive(false);
-                    RpcUploadImage();
+                    comments.RemoveAt(0);
                 }
+                allComments = string.Join("\n", comments.ToArray());
+
+                if (isServer)
+                {
+                    RpcUploadComment(other.gameObject, allComments);
+                }
+                if (isLocalPlayer)
+                {
+                    CmdUploadComment(other.gameObject, allComments);
+                }                
             }
         }
     }
 
-    [ClientRpc]
-    private void RpcUploadImage()
+    [Command]
+    private void CmdUploadComment(GameObject other, string comments)
     {
-        urlInputString = urlInput.text;
-        captionString = caption.text;
-        imageChanged = true;
-        StartCoroutine(LoadFromLikeCorouting());
+        RpcUploadComment(other, comments);
     }
 
     [ClientRpc]
-    private void RpcChangeCode(GameObject other)
+    private void RpcUploadComment(GameObject other, string comments)
     {
-        other.GetComponent<Text>().text = codeString;
-    }
 
-    [ClientRpc]
-    private void RpcChangeDashboardTasks(GameObject other)
-    {
-        other.GetComponent<Text>().text = $"Task name: {projTaskNameString}\nTask Description: {projTaskDescriptionString}\nTask assigned to: {projTaskMemberString}";
-    }
-
-    [ClientRpc]
-    private void RpcChangeDashboardMembers(GameObject other)
-    {
-        other.GetComponent<Text>().text = $"Members: \n{addMemberString}";
-    }
-
-    [ClientRpc]
-    private void RpcChangeDashboardGDD(GameObject other)
-    {
-        other.GetComponent<Text>().text = $"Game Design Document \n1.Overview - {projOverviewString}\n2.Platforms - {projPlatformsString}\n3.Genre - {projGenreString}\n4.Target Audience - {projTargetAudienceString}\n5.Storryline and Characters - {projStorylineString}\n6.Gameplay - {projGameplayString}\n7.Assets - {projAssetsString}\n8.Testing - {projTestingString}";
-    }
-
-    [ClientRpc]
-    private void RpcChangeDashBoardName(GameObject other)
-    {
-        other.GetComponent<Text>().text = projNameString;
+        other.GetComponent<Text>().text = comments;
     }
 
     [Command]
-    private void CmdChangeDashboardName(GameObject other)
+    private void CmdUploadImage(GameObject other, string url, string captionName)
     {
-        RpcChangeDashBoardName(other);
+        RpcUploadImage(other, url, captionName);
+    }
+
+    [ClientRpc]
+    private void RpcUploadImage(GameObject other, string url, string captionName)
+    {
+        StartCoroutine(LoadFromLikeCorouting(url, other));
+        Debug.Log(other.gameObject.name + other.gameObject.name);
+
+        GameObject.Find(other.gameObject.name + other.gameObject.name).GetComponent<Text>().text = captionName;
+    }
+
+    [Command]
+    private void CmdChangeCode(GameObject other, string name)
+    {
+        RpcChangeCode(other, name);
+    }
+
+    [ClientRpc]
+    private void RpcChangeCode(GameObject other, string name)
+    {
+        other.GetComponent<Text>().text = name;
+    }
+
+    [Command]
+    private void CmdChangeDashboardTasks(GameObject other, string nameName, string nameDescription, string nameMember)
+    {
+        RpcChangeDashboardTasks(other, nameName, nameDescription, nameMember);
+    }
+
+    [ClientRpc]
+    private void RpcChangeDashboardTasks(GameObject other, string nameName, string nameDescription, string nameMember)
+    {
+        other.GetComponent<Text>().text = $"Task name: {nameName}\nTask Description: {nameDescription}\nTask assigned to: {nameMember}";
+    }
+
+    [Command]
+    private void CmdChangeDashboardMembers(GameObject other, string name)
+    {
+        RpcChangeDashboardMembers(other, name);
+    }
+
+    [ClientRpc]
+    private void RpcChangeDashboardMembers(GameObject other, string name)
+    {
+        other.GetComponent<Text>().text = $"Members: \n{name}";
+    }
+
+    [Command]
+    private void CmdChangeDashboardGDD(GameObject other, string nameOverview, string namePlatforms, string nameGenre, string nameTargetAud, string nameStory, string nameGameplay, string nameAssets, string nameTesting)
+    {
+        RpcChangeDashboardGDD(other, nameOverview, namePlatforms, nameGenre, nameTargetAud, nameStory, nameGameplay, nameAssets, nameTesting);        
+    }
+
+    [ClientRpc]
+    private void RpcChangeDashboardGDD(GameObject other, string nameOverview, string namePlatforms, string nameGenre, string nameTargetAud, string nameStory, string nameGameplay, string nameAssets, string nameTesting)
+    {
+        other.GetComponent<Text>().text = $"Game Design Document \n1.Overview - {nameOverview}\n2.Platforms - {namePlatforms}\n3.Genre - {nameGenre}\n4.Target Audience - {nameTargetAud}\n5.Storryline and Characters - {nameStory}\n6.Gameplay - {nameGameplay}\n7.Assets - {nameAssets}\n8.Testing - {nameTesting}";
+    }
+
+    [Command]
+    private void CmdChangeDashboardName(GameObject other, string name)
+    {
+        RpcChangeDashBoardName(other, name);
+    }
+
+    [ClientRpc]
+    private void RpcChangeDashBoardName(GameObject other, string name)
+    {
+        other.GetComponent<Text>().text = name;
     }
 
     private void GetData()
@@ -246,12 +319,16 @@ public class Player_Create : NetworkBehaviour
         GameObject parentUploadImage = GameObject.Find("ParentUploadImage");
         uploadImagePanel = parentUploadImage.transform.GetChild(0).gameObject;
 
+        GameObject parentUploadComment = GameObject.Find("ParentUploadComment");
+        uploadCommentPanel = parentUploadComment.transform.GetChild(0).gameObject;
+
         projNamePanel.SetActive(true);
         projTaskPanel.SetActive(true);
         gddPanel.SetActive(true);
         addMemberPanel.SetActive(true);
         codePanel.SetActive(true);
         uploadImagePanel.SetActive(true);
+        uploadCommentPanel.SetActive(true);
 
         projName = GameObject.Find("ProjName").GetComponent<InputField>();
         projTaskName = GameObject.Find("ProjTaskName").GetComponent<InputField>();
@@ -269,8 +346,8 @@ public class Player_Create : NetworkBehaviour
         addMember = GameObject.Find("AddMember").GetComponent<InputField>();
         urlInput = GameObject.Find("URLInput").GetComponent<InputField>();
         caption = GameObject.Find("Caption").GetComponent<InputField>();
+        uploadedComment = GameObject.Find("UploadComment").GetComponent<InputField>();
 
-        planeRenderer = GameObject.Find("GalleryImage1").GetComponent<Renderer>();
 
         projNamePanel.SetActive(false);
         projTaskPanel.SetActive(false);
@@ -278,6 +355,7 @@ public class Player_Create : NetworkBehaviour
         addMemberPanel.SetActive(false);
         codePanel.SetActive(false);
         uploadImagePanel.SetActive(false);
+        uploadCommentPanel.SetActive(false);
     }
 
     private void ShowUI()
@@ -306,7 +384,7 @@ public class Player_Create : NetworkBehaviour
     private void HideUI()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
-        {
+        { 
             projNamePanel.SetActive(false);
             projTaskPanel.SetActive(false);
             gddPanel.SetActive(false);
@@ -319,14 +397,13 @@ public class Player_Create : NetworkBehaviour
         Application.OpenURL("https://www.google.co.uk/");
     }
 
-    private IEnumerator LoadFromLikeCorouting()
+    private IEnumerator LoadFromLikeCorouting(string url, GameObject other)
     { 
-        WWW wwwLoader = new WWW(urlInputString);
+        WWW wwwLoader = new WWW(url);
         yield return wwwLoader;
 
-        planeRenderer.material.color = Color.white;
-        planeRenderer.material.mainTexture = wwwLoader.texture;
+        other.GetComponent<Renderer>().material.color = Color.white;
+        other.GetComponent<Renderer>().material.mainTexture = wwwLoader.texture;
         Debug.Log("Image has loaded.");
     }
 }
-
