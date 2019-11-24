@@ -1,14 +1,18 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class Player_Create : NetworkBehaviour
 {
+    private Renderer planeRenderer;
+
     GameObject projNamePanel;
     GameObject projTaskPanel;
     GameObject gddPanel;
     GameObject addMemberPanel;
-
+    GameObject codePanel;
+    GameObject uploadImagePanel;
 
     private InputField projName;
     private InputField projTaskName;
@@ -23,6 +27,9 @@ public class Player_Create : NetworkBehaviour
     private InputField projAssets;
     private InputField projTesting;
     private InputField addMember;
+    private InputField codeField;
+    private InputField urlInput;
+    private InputField caption;
 
     //private Text projectNameDashboard;
     //private Text projectMembersDashboard;
@@ -55,33 +62,34 @@ public class Player_Create : NetworkBehaviour
     private string projTestingString;
     [SyncVar]
     private string addMemberString;
+    [SyncVar]
+    private string codeString;
+    [SyncVar]
+    private string urlInputString;
+    [SyncVar]
+    private string captionString;
+
+    [SyncVar]
+    private bool imageChanged;
 
     void Start()
     {
         GetData();
-        if (isServer)
-        {
-            //RpcUpdateData();
-        }
-        else if(isLocalPlayer)
-        {
-            //CmdUpdateData();
-        }
+    }
+
+    private void Update()
+    {
+
     }
 
     private void OnTriggerStay(Collider other)
     {
-        ShowUI();
-        HideUI();
+        
 
         if (other.CompareTag("ProjName"))
         {
-            //if(isLocalPlayer)
-            //{
-            //    projNameString = projName.text;
-            //    CmdChangeDashboardName(other.gameObject);
-            //    Debug.Log("Proj name var for client is: " + projNameString);
-            //}
+            ShowUI();
+            HideUI();
 
             if (isServer)
             {
@@ -91,7 +99,9 @@ public class Player_Create : NetworkBehaviour
         }
         if(other.CompareTag("ProjTask"))
         {
-            if(isServer)
+            ShowUI();
+            HideUI();
+            if (isServer)
             {
                 projTaskNameString = projTaskName.text;
                 projTaskDescriptionString = projTaskDescription.text;
@@ -101,7 +111,9 @@ public class Player_Create : NetworkBehaviour
         }
         if(other.CompareTag("ProjMember"))
         {
-            if(isServer)
+            ShowUI();
+            HideUI();
+            if (isServer)
             {
                 addMemberString = addMember.text;
                 RpcChangeDashboardMembers(other.gameObject);
@@ -109,7 +121,9 @@ public class Player_Create : NetworkBehaviour
         }
         if(other.CompareTag("ProjGDD"))
         {
-            if(isServer)
+            ShowUI();
+            HideUI();
+            if (isServer)
             {
                 projOverviewString = projOverview.text;
                 projPlatformsString = projPlatforms.text;
@@ -123,6 +137,63 @@ public class Player_Create : NetworkBehaviour
                 RpcChangeDashboardGDD(other.gameObject);
             }
         }
+        if(other.CompareTag("computer"))
+        {
+            if (isServer)
+            {
+                if (Input.GetKeyDown(KeyCode.K))
+                {
+                    codePanel.SetActive(true);
+                }
+                else if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    codePanel.SetActive(false);
+                }
+
+                codeString = codeField.text;
+                RpcChangeCode(other.gameObject);
+            }
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                OpenBrowser();
+            }
+        }
+        if (other.CompareTag("gallery"))
+        {
+            if (isServer)
+            {
+                if(Input.GetKeyDown(KeyCode.U))
+                {
+                    uploadImagePanel.SetActive(true);
+                }
+                if(Input.GetKeyDown(KeyCode.Escape))
+                {
+                    uploadImagePanel.SetActive(false);
+                }
+                else if(Input.GetKeyDown(KeyCode.Return) && uploadImagePanel.activeInHierarchy)
+                {
+                    urlInputString = urlInput.text;
+                    imageChanged = true;
+                    uploadImagePanel.SetActive(false);
+                    RpcUploadImage();
+                }
+            }
+        }
+    }
+
+    [ClientRpc]
+    private void RpcUploadImage()
+    {
+        urlInputString = urlInput.text;
+        captionString = caption.text;
+        imageChanged = true;
+        StartCoroutine(LoadFromLikeCorouting());
+    }
+
+    [ClientRpc]
+    private void RpcChangeCode(GameObject other)
+    {
+        other.GetComponent<Text>().text = codeString;
     }
 
     [ClientRpc]
@@ -169,10 +240,18 @@ public class Player_Create : NetworkBehaviour
         GameObject parentAddMember = GameObject.Find("ParentAddMember");
         addMemberPanel = parentAddMember.transform.GetChild(0).gameObject;
 
+        GameObject parentCode = GameObject.Find("ParentCode");
+        codePanel = parentCode.transform.GetChild(0).gameObject;
+
+        GameObject parentUploadImage = GameObject.Find("ParentUploadImage");
+        uploadImagePanel = parentUploadImage.transform.GetChild(0).gameObject;
+
         projNamePanel.SetActive(true);
         projTaskPanel.SetActive(true);
         gddPanel.SetActive(true);
         addMemberPanel.SetActive(true);
+        codePanel.SetActive(true);
+        uploadImagePanel.SetActive(true);
 
         projName = GameObject.Find("ProjName").GetComponent<InputField>();
         projTaskName = GameObject.Find("ProjTaskName").GetComponent<InputField>();
@@ -186,18 +265,19 @@ public class Player_Create : NetworkBehaviour
         projGameplay = GameObject.Find("ProjGameplay").GetComponent<InputField>();
         projAssets = GameObject.Find("ProjAssets").GetComponent<InputField>();
         projTesting = GameObject.Find("ProjTesting").GetComponent<InputField>();
-
+        codeField = GameObject.Find("CodeInputField").GetComponent<InputField>();
         addMember = GameObject.Find("AddMember").GetComponent<InputField>();
+        urlInput = GameObject.Find("URLInput").GetComponent<InputField>();
+        caption = GameObject.Find("Caption").GetComponent<InputField>();
 
-        //projectNameDashboard = GameObject.Find("ProjectNameDashboard").GetComponent<Text>();
-        //projectMembersDashboard = GameObject.Find("ProjectMemberDashbaord").GetComponent<Text>();
-        //GDDDashboard = GameObject.Find("GDDDashboard").GetComponent<Text>();
-        //projectTasksDashboard = GameObject.Find("ProjectTasksDashboard").GetComponent<Text>();
+        planeRenderer = GameObject.Find("GalleryImage1").GetComponent<Renderer>();
 
         projNamePanel.SetActive(false);
         projTaskPanel.SetActive(false);
         gddPanel.SetActive(false);
         addMemberPanel.SetActive(false);
+        codePanel.SetActive(false);
+        uploadImagePanel.SetActive(false);
     }
 
     private void ShowUI()
@@ -232,6 +312,21 @@ public class Player_Create : NetworkBehaviour
             gddPanel.SetActive(false);
             addMemberPanel.SetActive(false);
         }
+    }
+
+    private void OpenBrowser()
+    {
+        Application.OpenURL("https://www.google.co.uk/");
+    }
+
+    private IEnumerator LoadFromLikeCorouting()
+    { 
+        WWW wwwLoader = new WWW(urlInputString);
+        yield return wwwLoader;
+
+        planeRenderer.material.color = Color.white;
+        planeRenderer.material.mainTexture = wwwLoader.texture;
+        Debug.Log("Image has loaded.");
     }
 }
 

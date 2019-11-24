@@ -12,6 +12,7 @@ TagManager:
   - ProjTask
   - ProjMember
   - ProjGDD
+  - gallery
   layers:
   - Default
   - TransparentFX
