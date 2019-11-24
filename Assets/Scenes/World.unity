@@ -2044,7 +2044,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Comments here
+  m_Text: Press "C" to add a comment.
 --- !u!222 &97090842
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3584,7 +3584,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Caption Here
+  m_Text: Press "U" to add an image.
 --- !u!222 &145154236
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9341,7 +9341,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Caption Here
+  m_Text: Press "U" to add an image.
 --- !u!222 &392949967
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -20034,9 +20034,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Add Gane Design Document...
-
-'
+  m_Text: Pres "G" to add Game Design Document
 --- !u!222 &803251846
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -26119,7 +26117,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Add project members...
+  m_Text: Press "M" to add a member.
 --- !u!222 &1055329265
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -43558,7 +43556,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 7541864e350fad445bf468621fb998c9, type: 3}
-    m_FontSize: 158
+    m_FontSize: 103
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0
@@ -43569,7 +43567,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Add Project Name
+  m_Text: Press "N" to add project name
 --- !u!222 &1831564939
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -44930,7 +44928,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Comments here
+  m_Text: 'Press "C" to add a comment. '
 --- !u!222 &1878091515
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -50258,7 +50256,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Add new task...
+  m_Text: Press "T" to add a new task.
 --- !u!222 &2104159890
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -52066,7 +52064,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Press \"K\" to write your code.\n\nPress \"Esc\" to \nexit."
+  m_Text: Codeboard
 --- !u!4 &3821066044080128950
 Transform:
   m_ObjectHideFlags: 0

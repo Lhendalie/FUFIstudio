@@ -53,7 +53,7 @@ public class Player_Create : NetworkBehaviour
                 {
                     RpcChangeDashBoardName(other.gameObject, projName.text);
                 }
-                if (isLocalPlayer)
+                if (!isServer)
                 {
                     CmdChangeDashboardName(other.gameObject, projName.text);
                 }
@@ -71,7 +71,7 @@ public class Player_Create : NetworkBehaviour
                 {
                     RpcChangeDashboardTasks(other.gameObject, projTaskName.text, projTaskDescription.text, projTaskMember.text);
                 }
-                if (isLocalPlayer)
+                if (!isServer)
                 {
                     CmdChangeDashboardTasks(other.gameObject, projTaskName.text, projTaskDescription.text, projTaskMember.text);
                 }
@@ -89,7 +89,7 @@ public class Player_Create : NetworkBehaviour
                 {
                     RpcChangeDashboardMembers(other.gameObject, addMember.text);
                 }
-                if (isLocalPlayer)
+                if (!isServer)
                 {
                     CmdChangeDashboardMembers(other.gameObject, addMember.text);
                 }
@@ -107,7 +107,7 @@ public class Player_Create : NetworkBehaviour
                 {
                     RpcChangeDashboardGDD(other.gameObject, projOverview.text, projPlatforms.text, projGenre.text, projTargetAudience.text, projStoryline.text, projGameplay.text, projAssets.text, projTesting.text);
                 }
-                if (isLocalPlayer)
+                if (!isServer)
                 {
                     CmdChangeDashboardGDD(other.gameObject, projOverview.text, projPlatforms.text, projGenre.text, projTargetAudience.text, projStoryline.text, projGameplay.text, projAssets.text, projTesting.text);
                 }
@@ -132,7 +132,7 @@ public class Player_Create : NetworkBehaviour
                 {
                     RpcChangeCode(other.gameObject, codeField.text);
                 }
-                if (isLocalPlayer)
+                if (!isServer)
                 {
                     CmdChangeCode(other.gameObject, codeField.text);
                 }
@@ -170,7 +170,7 @@ public class Player_Create : NetworkBehaviour
 
                 Debug.Log("Called on enter.");
 
-                if (isLocalPlayer)
+                if (!isServer)
                 {
                     Debug.Log("Called on player.");
                     CmdUploadImage(other.gameObject, urlInput.text, caption.text);
@@ -196,7 +196,7 @@ public class Player_Create : NetworkBehaviour
                 {
                     RpcUploadComment(other.gameObject, uploadedComment.text);
                 }
-                if (isLocalPlayer)
+                if (!isServer)
                 {
                     CmdUploadComment(other.gameObject, uploadedComment.text);
                 }                
