@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -7,7 +8,6 @@ using UnityEngine.UI;
 public class Player_Create : NetworkBehaviour
 {
     private List<string> comments = new List<string>();
-    private string allComments;
 
     GameObject projNamePanel;
     GameObject projTaskPanel;
@@ -192,36 +192,35 @@ public class Player_Create : NetworkBehaviour
 
             if (Input.GetKeyDown(KeyCode.Return) && uploadCommentPanel.activeInHierarchy)
             {
-                comments.Add(uploadedComment.text);
-                if (comments.Count >= 24)
-                {
-                    comments.RemoveAt(0);
-                }
-                allComments = string.Join("\n", comments.ToArray());
-
                 if (isServer)
                 {
-                    RpcUploadComment(other.gameObject, allComments);
+                    RpcUploadComment(other.gameObject, uploadedComment.text);
                 }
                 if (isLocalPlayer)
                 {
-                    CmdUploadComment(other.gameObject, allComments);
+                    CmdUploadComment(other.gameObject, uploadedComment.text);
                 }                
             }
         }
     }
 
     [Command]
-    private void CmdUploadComment(GameObject other, string comments)
+    private void CmdUploadComment(GameObject other, string comment)
     {
-        RpcUploadComment(other, comments);
+        RpcUploadComment(other, comment);
     }
 
     [ClientRpc]
-    private void RpcUploadComment(GameObject other, string comments)
+    private void RpcUploadComment(GameObject other, string comment)
     {
+        comments.Add(comment);
 
-        other.GetComponent<Text>().text = comments;
+        if (comments.Count >= 24)
+        {
+            comments.RemoveAt(0);
+        }
+
+        other.GetComponent<Text>().text = string.Join("\n", comments);
     }
 
     [Command]
