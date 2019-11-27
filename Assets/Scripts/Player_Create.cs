@@ -17,6 +17,8 @@ public class Player_Create : NetworkBehaviour
     GameObject uploadImagePanel;
     GameObject uploadCommentPanel;
 
+    private Upload_Comment script;
+
     private InputField projName;
     private InputField projTaskName;
     private InputField projTaskDescription;
@@ -34,6 +36,9 @@ public class Player_Create : NetworkBehaviour
     private InputField urlInput;
     private InputField caption;
     private InputField uploadedComment;
+
+    //[SyncVar]
+    //private string allComments;
 
     void Start()
     {
@@ -192,6 +197,8 @@ public class Player_Create : NetworkBehaviour
 
             if (Input.GetKeyDown(KeyCode.Return) && uploadCommentPanel.activeInHierarchy)
             {
+                uploadCommentPanel.SetActive(false);
+
                 if (isServer)
                 {
                     RpcUploadComment(other.gameObject, uploadedComment.text);
@@ -199,10 +206,11 @@ public class Player_Create : NetworkBehaviour
                 if (!isServer)
                 {
                     CmdUploadComment(other.gameObject, uploadedComment.text);
-                }                
+                }
             }
         }
     }
+    
 
     [Command]
     private void CmdUploadComment(GameObject other, string comment)
@@ -213,14 +221,17 @@ public class Player_Create : NetworkBehaviour
     [ClientRpc]
     private void RpcUploadComment(GameObject other, string comment)
     {
-        comments.Add(comment);
+        Upload_Comment.comments.Add(comment);
 
         if (comments.Count >= 24)
         {
-            comments.RemoveAt(0);
+            Upload_Comment.comments.RemoveAt(0);
         }
 
-        other.GetComponent<Text>().text = string.Join("\n", comments);
+
+        Debug.Log($"{string.Join(",", Upload_Comment.comments)}");
+        other.GetComponent<Text>().text = string.Join("\n", Upload_Comment.comments);
+
     }
 
     [Command]
